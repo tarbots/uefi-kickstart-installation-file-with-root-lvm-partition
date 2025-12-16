@@ -30,6 +30,7 @@ firstboot --disable
 # ==== Enable direct root user login =======
 
 # Root password (example: 'password' -> enter the encrypted password)
+# You can generate encrypted password using openssl passwd -6 <desired password> command
 rootpw --iscrypted $6$XXXXX.XXXXX$bgtvadJRgH1lMAgwlfHd.FQkm9/hLyp.7zTdY1daW.igpSXXXXXO7Ttzh/b4F7LZZZZZZZ9
 qK00
 user --groups=wheel --name=analog --password=$6$a9gkn.ZZZZZZ$bgtvadJRgH1lMAgwlfHd.XXXXX/hLyp.YYYYYYY.BBBBBBBBB
