@@ -1,0 +1,63 @@
+# This Sample Kickstart file works for OL8, RHEL8, Rocky Linux 8 Flavor OS
+# Replace IP, hostname, DNS servers, Gateway and Interface names as needed in this file
+logging
+
+keyboard us
+lang en_US.UTF-8
+#Timezone entry can be changed in below line.
+timezone America/Chicago --utc
+text
+reboot
+
+# ==== Packages to install =======
+# Additional packages to be installed can be specified in below packages block.
+%packages
+@^minimal-environment
+@core
+@base
+wget
+git
+%end
+
+# Network information
+network  --bootproto=static --device=<interface> --gateway=10.141.XX.1 --ip=10.141.XX.29 --nameserver=206.XX.XX.1,206.XX.XX
+.2 --netmask=255.255.254.XX --noipv6 --activate
+
+network  --hostname=host1.testdomain.com
+
+firstboot --disable
+
+# ==== Enable direct root user login =======
+
+# Root password (example: 'password' -> enter the encrypted password)
+rootpw --iscrypted $6$XXXXX.XXXXX$bgtvadJRgH1lMAgwlfHd.FQkm9/hLyp.7zTdY1daW.igpSXXXXXO7Ttzh/b4F7LZZZZZZZ9
+qK00
+user --groups=wheel --name=analog --password=$6$a9gkn.ZZZZZZ$bgtvadJRgH1lMAgwlfHd.XXXXX/hLyp.YYYYYYY.BBBBBBBBB
+oeLVoO7Ttzh/b4F7L7XZKPNv69qK00 --iscrypted --gecos="analog"
+
+
+# Partitioning Information for UEFI
+# ---------------------------------
+# 1. Clear existing partitions and initialize disk label
+zerombr
+clearpart --all --initlabel
+
+# 2. REQUIRED: EFI System Partition (mounted at /boot/efi)
+# This must be formatted as vfat and should be around 200-600MB.
+part /boot/efi --fstype="efi" --size=1024 --ondisk=sda
+
+# 3. Standard Linux boot partition
+part /boot --fstype="xfs" --size=1024 --ondisk=sda
+
+# 4. Root partition (using LVM in this example)
+part pv.01 --grow --size=1 --ondisk=sda
+volgroup vg_root pv.01
+logvol swap --fstype="swap" --name=lv_swap --vgname=vg_root --size=2048
+logvol / --fstype="xfs" --name=lv_root --vgname=vg_root --size=1 --grow
+
+# Bootloader configuration
+# Note: UEFI systems do not use 'location=mbr'
+bootloader --append "rw ip=10.141.XX.29::10.141.XX.1:255.255.254.XX:host1.testdomain.com:<interface-name>:none rd.neednet=1"
+
+# Reboot after installation
+reboot
